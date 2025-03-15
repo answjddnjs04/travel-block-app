@@ -1,10 +1,7 @@
 import axios from 'axios';
 
-// GitHub Codespaces나 다른 환경에서의 백엔드 URL 설정
-const isCodespaces = !!process.env.CODESPACES;
-const BACKEND_URL = isCodespaces 
-  ? process.env.REACT_APP_BACKEND_URL || 'https://[your-backend-port-url].app.github.dev'
-  : 'http://localhost:5001';
+// GitHub Codespaces에서의 백엔드 URL 설정
+const BACKEND_URL = 'https://crispy-space-pancake-pj9r5vpvxr4jc9w76-5001.app.github.dev';
 
 const api = axios.create({
   baseURL: BACKEND_URL,
