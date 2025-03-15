@@ -8,20 +8,31 @@ const PlanList = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        const res = await api.get('/api/plans');
+  let isMounted = true;
+  
+  const fetchPlans = async () => {
+    try {
+      const res = await api.get('/api/plans');
+      if (isMounted) {
         setPlans(res.data);
         setLoading(false);
-      } catch (err) {
+      }
+    } catch (err) {
+      if (isMounted) {
         setError('여행 계획을 가져오는 중 오류가 발생했습니다');
         setLoading(false);
         console.error('오류 상세 정보:', err);
       }
-    };
+    }
+  };
 
-    fetchPlans();
-  }, []);
+  fetchPlans();
+  
+  // 클린업 함수
+  return () => {
+    isMounted = false;
+  };
+}, []);
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
