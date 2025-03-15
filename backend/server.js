@@ -23,9 +23,11 @@ mongoose.connect('mongodb://localhost:27017/travel-block-app', {
 
 // 라우트 가져오기
 const blockRoutes = require('./routes/blockRoutes');
+const planRoutes = require('./routes/planRoutes');
 
 // 라우트 설정
 app.use('/api/blocks', blockRoutes);
+app.use('/api/plans', planRoutes);
 
 // 서버 시작
 app.listen(PORT, () => {
