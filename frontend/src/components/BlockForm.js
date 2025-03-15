@@ -79,18 +79,18 @@ const BlockForm = () => {
     };
 
     try {
-      setLoading(true);
-      setError('');
-      
-      if (isEdit) {
-        // 블록 수정
-        await axios.put(`/api/blocks/${id}`, blockData);
-        setSuccess('블록이 성공적으로 수정되었습니다');
-      } else {
-        // 새 블록 생성
-        await axios.post('/api/blocks', blockData);
-        setSuccess('새 블록이 성공적으로 생성되었습니다');
-      }
+  setLoading(true);
+  setError('');
+  
+  if (isEdit) {
+    // 블록 수정
+    await api.put(`/api/blocks/${id}`, blockData);
+    setSuccess('블록이 성공적으로 수정되었습니다');
+  } else {
+    // 새 블록 생성
+    await api.post('/api/blocks', blockData);
+    setSuccess('새 블록이 성공적으로 생성되었습니다');
+  }
       
       setLoading(false);
       
