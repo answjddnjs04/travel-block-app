@@ -6,12 +6,13 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // CORS 설정 - 개발 환경을 위한 더 유연한 설정
-app.use(cors({
-  origin: true, // 모든 출처 허용
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-}));
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && origin.includes('.app.github.dev')) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  next();
+});
 
 app.use(express.json());
 
