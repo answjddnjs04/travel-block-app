@@ -1,12 +1,14 @@
 import axios from 'axios';
 
-// 개발 환경에서 proxy 설정 활용
+// 실제 백엔드 서버 URL
+const backendURL = 'https://crispy-space-pancake-pj9r5vpvxr4jc9w76-5001.app.github.dev';
+
 const api = axios.create({
-  baseURL: '', // 비워두면 package.json의 proxy 설정 사용
+  baseURL: backendURL,
   headers: {
     'Content-Type': 'application/json'
   },
-  withCredentials: true // CORS 이슈 해결을 위해 true로 설정
+  withCredentials: true
 });
 
 export default api;
