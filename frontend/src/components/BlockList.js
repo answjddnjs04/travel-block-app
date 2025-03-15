@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/axiosConfig';
 
 const BlockList = () => {
   const [blocks, setBlocks] = useState([]);
@@ -10,13 +10,14 @@ const BlockList = () => {
   useEffect(() => {
     const fetchBlocks = async () => {
       try {
-        const res = await axios.get('/api/blocks');
+        // 기존 axios 대신 구성된 api 객체 사용
+        const res = await api.get('/api/blocks');
         setBlocks(res.data);
         setLoading(false);
       } catch (err) {
         setError('블록을 가져오는 중 오류가 발생했습니다');
         setLoading(false);
-        console.error(err);
+        console.error('오류 상세 정보:', err);
       }
     };
 
