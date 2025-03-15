@@ -59,19 +59,39 @@ http://localhost:3000
 ## 프로젝트 구조
 
 ```
-travel-block-app/
-├── backend/          # 백엔드 코드
-│   ├── models/       # 데이터베이스 모델
-│   ├── routes/       # API 경로
-│   └── server.js     # 서버 설정
-├── frontend/         # 프론트엔드 코드
-│   ├── public/       # 정적 파일
-│   ├── src/          # React 소스 코드
-│   │   ├── components/  # 재사용 가능한 UI 조각
-│   │   └── App.js       # 메인 앱 파일
-│   └── package.json  # 의존성 관리
-├── .gitignore        # Git 제외 파일
-└── README.md         # 프로젝트 설명
+travel-block-app/                  # 루트 디렉토리
+│
+├── .gitignore                     # Git에서 제외할 파일 목록
+├── README.md                      # 프로젝트 설명 문서
+│
+├── backend/                       # 백엔드 디렉토리
+│   ├── package.json               # 백엔드 의존성 정보
+│   ├── server.js                  # 메인 서버 파일 (Express 앱 시작점)
+│   │
+│   ├── models/                    # 데이터베이스 모델 디렉토리
+│   │   └── blockModel.js          # 블록 데이터 모델 정의
+│   │
+│   └── routes/                    # API 라우트 디렉토리
+│       └── blockRoutes.js         # 블록 관련 API 라우트 정의
+│
+└── frontend/                      # 프론트엔드 디렉토리
+    ├── package.json               # 프론트엔드 의존성 정보
+    │
+    ├── public/                    # 정적 파일 디렉토리 (자동 생성됨)
+    │   ├── index.html             # 메인 HTML 파일
+    │   ├── favicon.ico            # 웹사이트 아이콘
+    │   └── manifest.json          # PWA 매니페스트 파일
+    │
+    └── src/                       # React 소스 코드 디렉토리
+        ├── App.js                 # 메인 앱 컴포넌트 (라우팅 설정)
+        ├── App.css                # 전역 스타일 정의
+        ├── index.js               # React 앱 진입점 (자동 생성됨)
+        │
+        └── components/            # 리액트 컴포넌트 디렉토리
+            ├── Navbar.js          # 네비게이션 바 컴포넌트
+            ├── BlockList.js       # 블록 목록 표시 컴포넌트
+            ├── BlockForm.js       # 블록 생성/수정 폼 컴포넌트
+            └── BlockDetail.js     # 블록 상세 정보 컴포넌트
 ```
 
 ## 확장 계획
