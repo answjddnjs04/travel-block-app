@@ -7,12 +7,10 @@ const PORT = process.env.PORT || 5001;
 
 // CORS 설정 - 개발 환경을 위한 더 유연한 설정
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://crispy-space-pancake-pj9r5vpvxr4jc9w76-3000.app.github.dev'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  origin: true, // 모든 출처 허용
   credentials: true,
-  preflightContinue: false,
-  optionsSuccessStatus: 204
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 app.use(express.json());
