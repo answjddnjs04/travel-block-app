@@ -18,7 +18,8 @@ app.use(cors({
 app.use(express.json());
 
 // MongoDB 연결 설정
-mongoose.connect('mongodb://localhost:27017/travel-block-app', {
+// MongoDB 연결 부분을 Atlas 연결 문자열로 교체
+mongoose.connect('mongodb+srv://infinitefoever:2004Moon0820!@cluster0.ohiex.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
