@@ -2,10 +2,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
-const PORT = process.env.PORT || 5001; // 포트를 5001로 변경
+const PORT = process.env.PORT || 5001;
 
-// 미들웨어 설정
-app.use(cors());
+// CORS 설정 수정 - 모든 출처 허용으로 변경
+app.use(cors({
+  origin: '*', // 모든 출처 허용 (개발 환경용)
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // MongoDB 연결
