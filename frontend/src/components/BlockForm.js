@@ -27,25 +27,25 @@ const BlockForm = () => {
       setLoading(true);
       
       const fetchBlock = async () => {
-        try {
-          const res = await axios.get(`/api/blocks/${id}`);
-          const blockData = res.data;
-          
-          setFormData({
-            name: blockData.name,
-            description: blockData.description || '',
-            location: blockData.location || '',
-            tags: blockData.tags.join(', '),
-            imageUrl: blockData.imageUrl || ''
-          });
-          
-          setLoading(false);
-        } catch (err) {
-          setError('블록 정보를 가져오는 중 오류가 발생했습니다');
-          setLoading(false);
-          console.error(err);
-        }
-      };
+  try {
+    const res = await api.get(`/api/blocks/${id}`);
+    const blockData = res.data;
+    
+    setFormData({
+      name: blockData.name,
+      description: blockData.description || '',
+      location: blockData.location || '',
+      tags: blockData.tags.join(', '),
+      imageUrl: blockData.imageUrl || ''
+    });
+    
+    setLoading(false);
+  } catch (err) {
+    setError('블록 정보를 가져오는 중 오류가 발생했습니다');
+    setLoading(false);
+    console.error(err);
+  }
+};
 
       fetchBlock();
     }
