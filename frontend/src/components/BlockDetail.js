@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/axiosConfig';
 
 const BlockDetail = () => {
   const { id } = useParams();
@@ -12,13 +12,13 @@ const BlockDetail = () => {
   useEffect(() => {
     const fetchBlock = async () => {
       try {
-        const res = await axios.get(`/api/blocks/${id}`);
+        const res = await api.get(`/api/blocks/${id}`);
         setBlock(res.data);
         setLoading(false);
       } catch (err) {
         setError('블록 정보를 가져오는 중 오류가 발생했습니다');
         setLoading(false);
-        console.error(err);
+        console.error('오류 상세 정보:', err);
       }
     };
 
@@ -28,11 +28,11 @@ const BlockDetail = () => {
   const handleDelete = async () => {
     if (window.confirm('정말로 이 블록을 삭제하시겠습니까?')) {
       try {
-        await axios.delete(`/api/blocks/${id}`);
+        await api.delete(`/api/blocks/${id}`);
         navigate('/');
       } catch (err) {
         setError('블록 삭제 중 오류가 발생했습니다');
-        console.error(err);
+        console.error('오류 상세 정보:', err);
       }
     }
   };
