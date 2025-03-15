@@ -4,11 +4,13 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// CORS 설정 수정 - 모든 출처 허용으로 변경
+// CORS 설정 수정 - 더 구체적인 설정으로 변경
 app.use(cors({
-  origin: '*', // 모든 출처 허용 (개발 환경용)
+  origin: ['http://localhost:3000', 'https://your-production-domain.com'], // 실제 도메인으로 바꿔주세요
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 204
 }));
 
 app.use(express.json());
