@@ -232,10 +232,12 @@ const PlanDetail = () => {
         ) : (
           <div className="blocks-list">
             {getBlocksByDay(activeDay).map((blockItem, index) => {
-              const blockIndex = plan.blocks.findIndex(b => 
-                b._id === blockItem._id
-              );
-              const block = blockItem.block;
+  // 전체 plan.blocks 배열에서의 인덱스 찾기
+  const blockIndex = plan.blocks.findIndex(b => 
+    b._id === blockItem._id
+  );
+  // blockItem.block이 있으면 그대로 사용, 없으면 기본 정보만 표시
+  const block = blockItem.block || { name: '정보 없음', location: '' };
               
               return (
                 <div 
