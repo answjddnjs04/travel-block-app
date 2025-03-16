@@ -22,33 +22,35 @@ const PlanForm = () => {
   const { title, description, startDate, endDate, isPublic, tags } = formData;
 
   useEffect(() => {
-  // 수정 모드인 경우 더미 데이터 사용
-  if (id) {
-    setIsEdit(true);
-    setLoading(true);
-    
-    // 더미 계획 데이터
-    const dummyPlanData = {
-      title: '서울 3일 여행',
-      description: '서울의 주요 관광지를 3일간 둘러보는 여행 계획',
-      startDate: new Date(2025, 3, 1),
-      endDate: new Date(2025, 3, 3),
-      isPublic: true,
-      tags: ['서울', '주말여행', '도시여행']
-    };
-    
-    setFormData({
-      title: dummyPlanData.title,
-      description: dummyPlanData.description || '',
-      startDate: dummyPlanData.startDate ? new Date(dummyPlanData.startDate).toISOString().split('T')[0] : '',
-      endDate: dummyPlanData.endDate ? new Date(dummyPlanData.endDate).toISOString().split('T')[0] : '',
-      isPublic: dummyPlanData.isPublic || false,
-      tags: dummyPlanData.tags ? dummyPlanData.tags.join(', ') : ''
-    });
-    
-    setLoading(false);
-  }
-}, [id]);
+    // 수정 모드인 경우 기존 여행 계획 가져오기
+    if (id) {
+      setIsEdit(true);
+      const fetchPlan = async () => {
+        try {
+          setLoading(true);
+          const res = await api.getPlan(id);
+          const plan = res.data;
+          
+          setFormData({
+            title: plan.title || '',
+            description: plan.description || '',
+            startDate: plan.startDate ? new Date(plan.startDate).toISOString().split('T')[0] : '',
+            endDate: plan.endDate ? new Date(plan.endDate).toISOString().split('T')[0] : '',
+            isPublic: plan.isPublic || false,
+            tags: plan.tags ? plan.tags.join(', ') : ''
+          });
+          
+          setLoading(false);
+        } catch (err) {
+          console.error('여행 계획 가져오기 오류:', err);
+          setError('여행 계획 정보를 가져오는 중 오류가 발생했습니다.');
+          setLoading(false);
+        }
+      };
+
+      fetchPlan();
+    }
+  }, [id]);
 
   const onChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
@@ -56,60 +58,63 @@ const PlanForm = () => {
   };
 
   const onSubmit = async (e) => {
-  e.preventDefault();
-  
-  // 기본 검증
-  if (!title.trim()) {
-    setError('여행 계획 제목은 필수입니다');
-    return;
-  }
-
-  // 날짜 검증
-  if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
-    setError('종료일은 시작일 이후여야 합니다');
-    return;
-  }
-
-  // 태그 변환 (문자열 -> 배열)
-  const tagsArray = tags
-    .split(',')
-    .map(tag => tag.trim())
-    .filter(tag => tag !== '');
-
-  const planData = {
-    title,
-    description,
-    startDate: startDate || undefined,
-    endDate: endDate || undefined,
-    isPublic,
-    tags: tagsArray
-  };
-
-  try {
-    setLoading(true);
-    setError('');
+    e.preventDefault();
     
-    if (isEdit) {
-      // 계획 수정 - API 호출 없이 성공 메시지
-      setSuccess('여행 계획이 성공적으로 수정되었습니다');
-    } else {
-      // 새 계획 생성 - API 호출 없이 성공 메시지
-      setSuccess('새 여행 계획이 성공적으로 생성되었습니다');
-      
-      // 생성된 계획으로 이동 (더미 ID 사용)
-      setTimeout(() => {
-        navigate(`/plans/plan-dummy-${Date.now()}`);
-      }, 2000);
+    // 기본 검증
+    if (!title.trim()) {
+      setError('여행 계획 제목은 필수입니다');
+      return;
     }
-    
-    setLoading(false);
-    
-  } catch (err) {
-    setError('여행 계획 저장 중 오류가 발생했습니다');
-    setLoading(false);
-    console.error(err);
-  }
-};
+
+    // 날짜 검증
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      setError('종료일은 시작일 이후여야 합니다');
+      return;
+    }
+
+    // 태그 변환 (문자열 -> 배열)
+    const tagsArray = tags
+      .split(',')
+      .map(tag => tag.trim())
+      .filter(tag => tag !== '');
+
+    const planData = {
+      title,
+      description,
+      startDate: startDate || undefined,
+      endDate: endDate || undefined,
+      isPublic,
+      tags: tagsArray
+    };
+
+    try {
+      setLoading(true);
+      setError('');
+      
+      let res;
+      if (isEdit) {
+        // 기존 계획 수정
+        res = await api.updatePlan(id, planData);
+        setSuccess('여행 계획이 성공적으로 수정되었습니다');
+      } else {
+        // 새 계획 생성
+        res = await api.createPlan(planData);
+        setSuccess('새 여행 계획이 성공적으로 생성되었습니다');
+      }
+      
+      setLoading(false);
+      
+      // 잠시 후 상세 페이지로 이동
+      setTimeout(() => {
+        navigate(`/plans/${res.data._id}`);
+      }, 2000);
+      
+    } catch (err) {
+      console.error('여행 계획 저장 오류:', err);
+      setError('여행 계획 저장 중 오류가 발생했습니다');
+      setLoading(false);
+    }
+  };
 
   if (loading && isEdit) {
     return <div>여행 계획 정보를 가져오는 중...</div>;
@@ -199,7 +204,7 @@ const PlanForm = () => {
           <small className="form-text">공개 설정시 다른 사용자가 이 여행 계획을 볼 수 있습니다</small>
         </div>
         
-        <div className="form-actions">
+        <div className="actions">
           <input
             type="submit"
             value={loading ? '저장 중...' : (isEdit ? '여행 계획 수정' : '여행 계획 생성')}
