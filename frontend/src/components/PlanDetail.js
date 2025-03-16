@@ -14,26 +14,72 @@ const PlanDetail = () => {
   const [draggedItem, setDraggedItem] = useState(null);
 
   useEffect(() => {
-    const fetchPlanAndBlocks = async () => {
-      try {
-        // 여행 계획 정보 가져오기
-        const planRes = await api.get(`/api/plans/${id}`);
-        setPlan(planRes.data);
-        
-        // 사용 가능한 모든 블록 가져오기
-        const blocksRes = await api.get('/api/blocks');
-        setAvailableBlocks(blocksRes.data);
-        
-        setLoading(false);
-      } catch (err) {
-        setError('정보를 가져오는 중 오류가 발생했습니다');
-        setLoading(false);
-        console.error(err);
+  // 더미 데이터로 대체
+  // 여행 계획 더미 데이터
+  const dummyPlan = {
+    _id: id,
+    title: '서울 3일 여행',
+    description: '서울의 주요 관광지를 3일간 둘러보는 여행 계획',
+    startDate: new Date(2025, 3, 1),
+    endDate: new Date(2025, 3, 3),
+    blocks: [
+      {
+        _id: 'plan-block-1',
+        block: {
+          _id: 'dummy-id-1',
+          name: '서울 남산타워',
+          location: '서울 용산구',
+          imageUrl: 'https://via.placeholder.com/400x200?text=남산타워'
+        },
+        order: 1,
+        day: 1,
+        note: '오전에 방문하기 좋아요'
+      },
+      {
+        _id: 'plan-block-2',
+        block: {
+          _id: 'dummy-id-2',
+          name: '경복궁',
+          location: '서울 종로구',
+          imageUrl: 'https://via.placeholder.com/400x200?text=경복궁'
+        },
+        order: 2,
+        day: 1,
+        note: '역사적인 장소입니다'
       }
-    };
-
-    fetchPlanAndBlocks();
-  }, [id]);
+    ],
+    tags: ['서울', '주말여행', '도시여행'],
+    isPublic: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+  
+  // 사용 가능한 블록 더미 데이터
+  const dummyBlocks = [
+    {
+      _id: 'dummy-id-1',
+      name: '서울 남산타워',
+      location: '서울 용산구',
+      tags: ['서울', '관광']
+    },
+    {
+      _id: 'dummy-id-2',
+      name: '경복궁',
+      location: '서울 종로구',
+      tags: ['서울', '역사']
+    },
+    {
+      _id: 'dummy-id-3',
+      name: '명동 쇼핑거리',
+      location: '서울 중구',
+      tags: ['서울', '쇼핑']
+    }
+  ];
+  
+  setPlan(dummyPlan);
+  setAvailableBlocks(dummyBlocks);
+  setLoading(false);
+}, [id]);
 
   // 계획 삭제 처리
   const handleDelete = async () => {
