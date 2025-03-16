@@ -21,35 +21,31 @@ const BlockForm = () => {
   const { name, description, location, tags, imageUrl } = formData;
 
   useEffect(() => {
-    // 수정 모드인 경우 기존 블록 데이터 가져오기
-    if (id) {
-      setIsEdit(true);
-      setLoading(true);
-      
-      const fetchBlock = async () => {
-  try {
-    const res = await api.get(`/api/blocks/${id}`);
-    const blockData = res.data;
+  // 수정 모드인 경우 더미 데이터 사용
+  if (id) {
+    setIsEdit(true);
+    setLoading(true);
+    
+    // 더미 데이터 설정
+    const dummyBlockData = {
+      name: '서울 남산타워',
+      description: '서울의 중심에 위치한 남산서울타워는 대한민국을 대표하는 관광지입니다.',
+      location: '서울 용산구 남산공원길 105',
+      tags: ['서울', '관광', '전망대'],
+      imageUrl: 'https://via.placeholder.com/400x200?text=남산타워'
+    };
     
     setFormData({
-      name: blockData.name,
-      description: blockData.description || '',
-      location: blockData.location || '',
-      tags: blockData.tags.join(', '),
-      imageUrl: blockData.imageUrl || ''
+      name: dummyBlockData.name,
+      description: dummyBlockData.description || '',
+      location: dummyBlockData.location || '',
+      tags: dummyBlockData.tags.join(', '),
+      imageUrl: dummyBlockData.imageUrl || ''
     });
     
     setLoading(false);
-  } catch (err) {
-    setError('블록 정보를 가져오는 중 오류가 발생했습니다');
-    setLoading(false);
-    console.error(err);
   }
-};
-
-      fetchBlock();
-    }
-  }, [id]);
+}, [id]);
 
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
