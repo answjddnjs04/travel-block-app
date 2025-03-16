@@ -8,66 +8,20 @@ const PlanList = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-  let isMounted = true;
-  
-  // 더미 데이터로 대체
-  const dummyPlans = [
-    {
-      _id: 'plan-dummy-1',
-      title: '서울 3일 여행',
-      description: '서울의 주요 관광지를 3일간 둘러보는 여행 계획',
-      startDate: new Date(2025, 3, 1),
-      endDate: new Date(2025, 3, 3),
-      blocks: [
-        {
-          block: {
-            _id: 'dummy-id-1',
-            name: '서울 남산타워'
-          },
-          order: 1,
-          day: 1
-        },
-        {
-          block: {
-            _id: 'dummy-id-2',
-            name: '경복궁'
-          },
-          order: 2,
-          day: 1
-        }
-      ],
-      tags: ['서울', '주말여행', '도시여행']
-    },
-    {
-      _id: 'plan-dummy-2',
-      title: '제주 일주 여행',
-      description: '제주도를 일주하는 5일 여행 코스',
-      startDate: new Date(2025, 5, 10),
-      endDate: new Date(2025, 5, 14),
-      blocks: [
-        {
-          block: {
-            _id: 'dummy-id-3',
-            name: '성산일출봉'
-          },
-          order: 1,
-          day: 1
-        }
-      ],
-      tags: ['제주', '자연', '휴양']
-    }
-  ];
-  
-  if (isMounted) {
-    setPlans(dummyPlans);
-    setLoading(false);
-  }
-  
-  // 클린업 함수
-  return () => {
-    isMounted = false;
-  };
-}, []);
+    const fetchPlans = async () => {
+      try {
+        const res = await api.getPlans();
+        setPlans(res.data);
+        setLoading(false);
+      } catch (err) {
+        console.error('여행 계획 가져오기 오류:', err);
+        setError('여행 계획 목록을 가져오는 중 오류가 발생했습니다.');
+        setLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, []);
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -84,12 +38,13 @@ const PlanList = () => {
 
   return (
     <div>
-      <div className="plans-header">
-        <h1>여행 계획 목록</h1>
+      <div className="actions">
         <Link to="/plans/create" className="btn btn-primary">
           새 여행 계획 만들기
         </Link>
       </div>
+
+      <h1>여행 계획 목록</h1>
 
       {plans.length === 0 ? (
         <div className="alert">등록된 여행 계획이 없습니다. 첫 여행 계획을 생성해보세요!</div>
@@ -110,9 +65,9 @@ const PlanList = () => {
               {plan.description && <p>{plan.description.substring(0, 100)}...</p>}
               
               <div className="plan-stats">
-                <p>블록 수: {plan.blocks.length}개</p>
+                <p>블록 수: {plan.blocks ? plan.blocks.length : 0}개</p>
                 <p>여행 일수: {
-                  plan.blocks.length > 0 ? 
+                  plan.blocks && plan.blocks.length > 0 ? 
                   Math.max(...plan.blocks.map(block => block.day)) : 0
                 }일</p>
               </div>
