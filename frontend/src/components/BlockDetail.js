@@ -27,16 +27,16 @@ const BlockDetail = () => {
 }, [id]);
 
   const handleDelete = async () => {
-    if (window.confirm('정말로 이 블록을 삭제하시겠습니까?')) {
-      try {
-        await api.delete(`/api/blocks/${id}`);
-        navigate('/');
-      } catch (err) {
-        setError('블록 삭제 중 오류가 발생했습니다');
-        console.error('오류 상세 정보:', err);
-      }
+  if (window.confirm('정말로 이 블록을 삭제하시겠습니까?')) {
+    try {
+      // API 호출 없이 바로 리다이렉트
+      navigate('/');
+    } catch (err) {
+      setError('블록 삭제 중 오류가 발생했습니다');
+      console.error('오류 상세 정보:', err);
     }
-  };
+  }
+};
 
   if (loading) {
     return <div>로딩 중...</div>;
