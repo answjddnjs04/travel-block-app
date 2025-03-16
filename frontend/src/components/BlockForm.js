@@ -171,4 +171,29 @@ const BlockForm = () => {
           <label htmlFor="imageUrl">이미지 URL</label>
           <input
             type="text"
-            id="imageUrl
+            id="imageUrl"
+            name="imageUrl"
+            value={imageUrl}
+            onChange={onChange}
+            placeholder="이미지 URL을 입력하세요"
+          />
+          <small className="form-text">이미지 URL을 입력하거나 비워둘 수 있습니다</small>
+        </div>
+        
+        <div className="actions">
+          <input
+            type="submit"
+            value={loading ? '저장 중...' : (isEdit ? '블록 수정' : '블록 생성')}
+            className="btn btn-primary"
+            disabled={loading}
+          />
+          <Link to="/" className="btn">
+            취소
+          </Link>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default BlockForm;
