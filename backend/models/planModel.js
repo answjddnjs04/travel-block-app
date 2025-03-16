@@ -39,40 +39,12 @@ const planSchema = new mongoose.Schema({
       note: {
         type: String,
         default: ''
-      },
-      transportationToNext: {
-        type: {
-          type: String,
-          enum: ['walking', 'driving', 'transit', 'taxi', 'none'],
-          default: 'none'
-        },
-        duration: {
-          type: Number,
-          default: 0
-        },
-        cost: {
-          type: Number,
-          default: 0
-        }
       }
     }
   ],
   tags: {
     type: [String],
     default: []
-  },
-  // 공동 작업 가능한 사용자 목록 (향후 사용자 인증 구현 후 활성화)
-  collaborators: {
-    type: [String],
-    default: []
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
   }
 }, {
   timestamps: true
