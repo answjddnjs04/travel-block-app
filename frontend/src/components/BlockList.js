@@ -8,21 +8,34 @@ const BlockList = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchBlocks = async () => {
-      try {
-        // 기존 axios 대신 구성된 api 객체 사용
-        const res = await api.get('/api/blocks');
-        setBlocks(res.data);
-        setLoading(false);
-      } catch (err) {
-        setError('블록을 가져오는 중 오류가 발생했습니다');
-        setLoading(false);
-        console.error('오류 상세 정보:', err);
-      }
-    };
-
-    fetchBlocks();
-  }, []);
+  // 백엔드 API 호출 대신 더미 데이터 직접 사용
+  const dummyBlocks = [
+    { 
+      _id: 'dummy-id-1', 
+      name: '서울 남산타워', 
+      description: '서울의 중심에 위치한 남산서울타워는 대한민국을 대표하는 관광지입니다.', 
+      location: '서울 용산구', 
+      tags: ['서울', '관광', '전망대'],
+      imageUrl: 'https://via.placeholder.com/400x200?text=남산타워',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    { 
+      _id: 'dummy-id-2', 
+      name: '부산 해운대 해변', 
+      description: '부산의 대표적인 해변으로, 아름다운 해안선과 화려한 도시 경관을 함께 즐길 수 있습니다.', 
+      location: '부산 해운대구', 
+      tags: ['부산', '해변', '여름'],
+      imageUrl: 'https://via.placeholder.com/400x200?text=해운대해변',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  ];
+  
+  // API 호출 대신 더미 데이터 직접 설정
+  setBlocks(dummyBlocks);
+  setLoading(false);
+}, []);
 
   if (loading) {
     return <div>로딩 중...</div>;
