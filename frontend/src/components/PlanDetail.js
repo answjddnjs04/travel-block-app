@@ -14,187 +14,78 @@ const PlanDetail = () => {
   const [draggedItem, setDraggedItem] = useState(null);
 
   useEffect(() => {
-  // 더미 데이터로 대체
-  // 여행 계획 더미 데이터
-  const dummyPlan = {
-    _id: id,
-    title: '서울 3일 여행',
-    description: '서울의 주요 관광지를 3일간 둘러보는 여행 계획',
-    startDate: new Date(2025, 3, 1),
-    endDate: new Date(2025, 3, 3),
-    blocks: [
-      {
-        _id: 'plan-block-1',
-        block: {
-          _id: 'dummy-id-1',
-          name: '서울 남산타워',
-          location: '서울 용산구',
-          imageUrl: 'https://via.placeholder.com/400x200?text=남산타워'
-        },
-        order: 1,
-        day: 1,
-        note: '오전에 방문하기 좋아요'
-      },
-      {
-        _id: 'plan-block-2',
-        block: {
-          _id: 'dummy-id-2',
-          name: '경복궁',
-          location: '서울 종로구',
-          imageUrl: 'https://via.placeholder.com/400x200?text=경복궁'
-        },
-        order: 2,
-        day: 1,
-        note: '역사적인 장소입니다'
+    const fetchData = async () => {
+      try {
+        // 여행 계획 가져오기
+        const planRes = await api.getPlan(id);
+        setPlan(planRes.data);
+        
+        // 사용 가능한 블록 목록 가져오기
+        const blocksRes = await api.getBlocks();
+        setAvailableBlocks(blocksRes.data);
+        
+        setLoading(false);
+      } catch (err) {
+        console.error('여행 계획 가져오기 오류:', err);
+        setError('여행 계획 정보를 가져오는 중 오류가 발생했습니다.');
+        setLoading(false);
       }
-    ],
-    tags: ['서울', '주말여행', '도시여행'],
-    isPublic: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  };
-  
-  // 사용 가능한 블록 더미 데이터
-  const dummyBlocks = [
-    {
-      _id: 'dummy-id-1',
-      name: '서울 남산타워',
-      location: '서울 용산구',
-      tags: ['서울', '관광']
-    },
-    {
-      _id: 'dummy-id-2',
-      name: '경복궁',
-      location: '서울 종로구',
-      tags: ['서울', '역사']
-    },
-    {
-      _id: 'dummy-id-3',
-      name: '명동 쇼핑거리',
-      location: '서울 중구',
-      tags: ['서울', '쇼핑']
-    }
-  ];
-  
-  setPlan(dummyPlan);
-  setAvailableBlocks(dummyBlocks);
-  setLoading(false);
-}, [id]);
+    };
+
+    fetchData();
+  }, [id]);
 
   // 계획 삭제 처리
-const handleDelete = async () => {
-  if (window.confirm('정말로 이 여행 계획을 삭제하시겠습니까?')) {
-    try {
-      // API 호출 없이 바로 리다이렉트
-      navigate('/plans');
-    } catch (err) {
-      setError('여행 계획 삭제 중 오류가 발생했습니다');
-      console.error(err);
+  const handleDelete = async () => {
+    if (window.confirm('정말로 이 여행 계획을 삭제하시겠습니까?')) {
+      try {
+        await api.deletePlan(id);
+        navigate('/plans');
+      } catch (err) {
+        console.error('여행 계획 삭제 오류:', err);
+        setError('여행 계획 삭제 중 오류가 발생했습니다.');
+      }
     }
-  }
-};
+  };
 
   // 블록 추가 처리
-const handleAddBlock = async (blockId) => {
-  try {
-    // 현재 일자의 마지막 순서 계산
-    const blocksInCurrentDay = plan.blocks.filter(block => block.day === activeDay);
-    const nextOrder = blocksInCurrentDay.length > 0 ? 
-      Math.max(...blocksInCurrentDay.map(block => block.order)) + 1 : 1;
-    
-    // 선택한 블록 정보 찾기
-    const selectedBlock = availableBlocks.find(block => block._id === blockId);
-    
-    // 더미 데이터로 새 계획 생성
-    const updatedPlan = {...plan};
-    updatedPlan.blocks.push({
-      _id: 'new-plan-block-' + Date.now(),
-      block: selectedBlock,
-      order: nextOrder,
-      day: activeDay,
-      note: ''
-    });
-    
-    // 상태 업데이트
-    setPlan(updatedPlan);
-    setShowBlockSelector(false);
-  } catch (err) {
-    setError('블록 추가 중 오류가 발생했습니다');
-    console.error(err);
-  }
-};
-
-  // 블록 제거 처리
-  // 블록 제거 처리
-const handleRemoveBlock = async (blockIndex) => {
-  if (window.confirm('이 블록을 여행 계획에서 제거하시겠습니까?')) {
+  const handleAddBlock = async (blockId) => {
     try {
-      // 블록 제거 로직 (API 호출 없이)
-      const updatedPlan = {...plan};
-      updatedPlan.blocks = updatedPlan.blocks.filter((_, index) => index !== blockIndex);
+      // 현재 일자의 마지막 순서 계산
+      const blocksInCurrentDay = plan.blocks.filter(block => block.day === activeDay);
+      const nextOrder = blocksInCurrentDay.length > 0 ? 
+        Math.max(...blocksInCurrentDay.map(block => block.order)) + 1 : 1;
       
-      // 상태 업데이트
-      setPlan(updatedPlan);
+      // 새 블록 데이터
+      const blockData = {
+        block: blockId,
+        order: nextOrder,
+        day: activeDay,
+        note: ''
+      };
+      
+      // API 호출
+      const res = await api.addBlockToPlan(id, blockData);
+      setPlan(res.data);
+      setShowBlockSelector(false);
     } catch (err) {
-      setError('블록 제거 중 오류가 발생했습니다');
-      console.error(err);
+      console.error('블록 추가 오류:', err);
+      setError('블록 추가 중 오류가 발생했습니다.');
     }
-  }
-};
-
-  // 드래그 앤 드롭 처리 함수들
-  const handleDragStart = (e, index) => {
-    setDraggedItem(index);
-    e.dataTransfer.effectAllowed = 'move';
-    // 드래그하는 요소의 모양 설정
-    e.dataTransfer.setDragImage(e.target, 20, 20);
   };
 
-  const handleDragOver = (e, index) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleDrop = async (e, targetIndex) => {
-  e.preventDefault();
-  
-  if (draggedItem === null || draggedItem === targetIndex) return;
-  
-  try {
-    // 현재 블록들 복사
-    const updatedPlan = {...plan};
-    const sourceBlock = {...updatedPlan.blocks[draggedItem]};
-    const targetBlock = {...updatedPlan.blocks[targetIndex]};
-    
-    // 같은 날짜 내에서만 재정렬
-    if (sourceBlock.day === targetBlock.day) {
-      // 순서 업데이트 (API 호출 없이)
-      const tempOrder = sourceBlock.order;
-      sourceBlock.order = targetBlock.order;
-      targetBlock.order = tempOrder;
-      
-      // 블록 배열 업데이트
-      updatedPlan.blocks[draggedItem] = sourceBlock;
-      updatedPlan.blocks[targetIndex] = targetBlock;
-      
-      // 순서대로 정렬
-      updatedPlan.blocks.sort((a, b) => {
-        if (a.day === b.day) {
-          return a.order - b.order;
-        }
-        return a.day - b.day;
-      });
-      
-      // 상태 업데이트
-      setPlan(updatedPlan);
+  // 블록 제거 처리
+  const handleRemoveBlock = async (blockId) => {
+    if (window.confirm('이 블록을 여행 계획에서 제거하시겠습니까?')) {
+      try {
+        const res = await api.removeBlockFromPlan(id, blockId);
+        setPlan(res.data);
+      } catch (err) {
+        console.error('블록 제거 오류:', err);
+        setError('블록 제거 중 오류가 발생했습니다.');
+      }
     }
-  } catch (err) {
-    setError('블록 순서 변경 중 오류가 발생했습니다');
-    console.error(err);
-  }
-  
-  setDraggedItem(null);
-};
+  };
 
   // 날짜 포맷 함수
   const formatDate = (dateString) => {
@@ -291,26 +182,17 @@ const handleRemoveBlock = async (blockIndex) => {
           <div className="no-blocks">이 날짜에 등록된 블록이 없습니다.</div>
         ) : (
           <div className="blocks-list">
-            {getBlocksByDay(activeDay).map((blockItem, index) => {
-  // 전체 plan.blocks 배열에서의 인덱스 찾기
-  const blockIndex = plan.blocks.findIndex(b => 
-    b._id === blockItem._id
-  );
-  // blockItem.block이 있으면 그대로 사용, 없으면 기본 정보만 표시
-  const block = blockItem.block || { name: '정보 없음', location: '' };
+            {getBlocksByDay(activeDay).map((blockItem) => {
+              const block = blockItem.block || {};
               
               return (
                 <div 
-                  key={blockIndex} 
+                  key={blockItem._id} 
                   className="plan-block-item"
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, blockIndex)}
-                  onDragOver={(e) => handleDragOver(e, blockIndex)}
-                  onDrop={(e) => handleDrop(e, blockIndex)}
                 >
                   <div className="block-order">{blockItem.order}</div>
                   <div className="block-content">
-                    <h3>{block.name}</h3>
+                    <h3>{block.name || '정보 없음'}</h3>
                     {block.location && <p>{block.location}</p>}
                     
                     {blockItem.note && (
@@ -322,7 +204,12 @@ const handleRemoveBlock = async (blockIndex) => {
                     {block.imageUrl && (
                       <div 
                         className="block-image" 
-                        style={{ backgroundImage: `url(${block.imageUrl})` }}
+                        style={{ 
+                          backgroundImage: `url(${block.imageUrl})`,
+                          height: '120px',
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
                       ></div>
                     )}
                     
@@ -332,7 +219,7 @@ const handleRemoveBlock = async (blockIndex) => {
                       </Link>
                       <button 
                         className="btn btn-small btn-danger"
-                        onClick={() => handleRemoveBlock(blockIndex)}
+                        onClick={() => handleRemoveBlock(blockItem._id)}
                       >
                         제거
                       </button>
