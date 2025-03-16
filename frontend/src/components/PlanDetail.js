@@ -82,59 +82,65 @@ const PlanDetail = () => {
 }, [id]);
 
   // 계획 삭제 처리
-  const handleDelete = async () => {
-    if (window.confirm('정말로 이 여행 계획을 삭제하시겠습니까?')) {
-      try {
-        await api.delete(`/api/plans/${id}`);
-        navigate('/plans');
-      } catch (err) {
-        setError('여행 계획 삭제 중 오류가 발생했습니다');
-        console.error(err);
-      }
-    }
-  };
-
-  // 블록 추가 처리
-  const handleAddBlock = async (blockId) => {
+const handleDelete = async () => {
+  if (window.confirm('정말로 이 여행 계획을 삭제하시겠습니까?')) {
     try {
-      // 현재 일자의 마지막 순서 계산
-      const blocksInCurrentDay = plan.blocks.filter(block => block.day === activeDay);
-      const nextOrder = blocksInCurrentDay.length > 0 ? 
-        Math.max(...blocksInCurrentDay.map(block => block.order)) + 1 : 1;
-      
-      await api.post(`/api/plans/${id}/blocks`, {
-        blockId,
-        day: activeDay,
-        order: nextOrder,
-        note: ''
-      });
-      
-      // 여행 계획 다시 가져오기
-      const res = await api.get(`/api/plans/${id}`);
-      setPlan(res.data);
-      
-      setShowBlockSelector(false);
+      // API 호출 없이 바로 리다이렉트
+      navigate('/plans');
     } catch (err) {
-      setError('블록 추가 중 오류가 발생했습니다');
+      setError('여행 계획 삭제 중 오류가 발생했습니다');
       console.error(err);
     }
-  };
+  }
+};
+
+  // 블록 추가 처리
+const handleAddBlock = async (blockId) => {
+  try {
+    // 현재 일자의 마지막 순서 계산
+    const blocksInCurrentDay = plan.blocks.filter(block => block.day === activeDay);
+    const nextOrder = blocksInCurrentDay.length > 0 ? 
+      Math.max(...blocksInCurrentDay.map(block => block.order)) + 1 : 1;
+    
+    // 선택한 블록 정보 찾기
+    const selectedBlock = availableBlocks.find(block => block._id === blockId);
+    
+    // 더미 데이터로 새 계획 생성
+    const updatedPlan = {...plan};
+    updatedPlan.blocks.push({
+      _id: 'new-plan-block-' + Date.now(),
+      block: selectedBlock,
+      order: nextOrder,
+      day: activeDay,
+      note: ''
+    });
+    
+    // 상태 업데이트
+    setPlan(updatedPlan);
+    setShowBlockSelector(false);
+  } catch (err) {
+    setError('블록 추가 중 오류가 발생했습니다');
+    console.error(err);
+  }
+};
 
   // 블록 제거 처리
-  const handleRemoveBlock = async (blockIndex) => {
-    if (window.confirm('이 블록을 여행 계획에서 제거하시겠습니까?')) {
-      try {
-        await api.delete(`/api/plans/${id}/blocks/${blockIndex}`);
-        
-        // 여행 계획 다시 가져오기
-        const res = await api.get(`/api/plans/${id}`);
-        setPlan(res.data);
-      } catch (err) {
-        setError('블록 제거 중 오류가 발생했습니다');
-        console.error(err);
-      }
+  // 블록 제거 처리
+const handleRemoveBlock = async (blockIndex) => {
+  if (window.confirm('이 블록을 여행 계획에서 제거하시겠습니까?')) {
+    try {
+      // 블록 제거 로직 (API 호출 없이)
+      const updatedPlan = {...plan};
+      updatedPlan.blocks = updatedPlan.blocks.filter((_, index) => index !== blockIndex);
+      
+      // 상태 업데이트
+      setPlan(updatedPlan);
+    } catch (err) {
+      setError('블록 제거 중 오류가 발생했습니다');
+      console.error(err);
     }
-  };
+  }
+};
 
   // 드래그 앤 드롭 처리 함수들
   const handleDragStart = (e, index) => {
@@ -150,37 +156,45 @@ const PlanDetail = () => {
   };
 
   const handleDrop = async (e, targetIndex) => {
-    e.preventDefault();
+  e.preventDefault();
+  
+  if (draggedItem === null || draggedItem === targetIndex) return;
+  
+  try {
+    // 현재 블록들 복사
+    const updatedPlan = {...plan};
+    const sourceBlock = {...updatedPlan.blocks[draggedItem]};
+    const targetBlock = {...updatedPlan.blocks[targetIndex]};
     
-    if (draggedItem === null || draggedItem === targetIndex) return;
-    
-    try {
-      // 현재 블록들 복사
-      const newBlocks = [...plan.blocks];
-      const sourceBlock = newBlocks[draggedItem];
-      const targetBlock = newBlocks[targetIndex];
+    // 같은 날짜 내에서만 재정렬
+    if (sourceBlock.day === targetBlock.day) {
+      // 순서 업데이트 (API 호출 없이)
+      const tempOrder = sourceBlock.order;
+      sourceBlock.order = targetBlock.order;
+      targetBlock.order = tempOrder;
       
-      // 같은 날짜 내에서만 재정렬
-      if (sourceBlock.day === targetBlock.day) {
-        // 순서 업데이트
-        await api.put(`/api/plans/${id}/blocks/reorder`, {
-          blockUpdates: [
-            { index: draggedItem, order: targetBlock.order },
-            { index: targetIndex, order: sourceBlock.order }
-          ]
-        });
-        
-        // 여행 계획 다시 가져오기
-        const res = await api.get(`/api/plans/${id}`);
-        setPlan(res.data);
-      }
-    } catch (err) {
-      setError('블록 순서 변경 중 오류가 발생했습니다');
-      console.error(err);
+      // 블록 배열 업데이트
+      updatedPlan.blocks[draggedItem] = sourceBlock;
+      updatedPlan.blocks[targetIndex] = targetBlock;
+      
+      // 순서대로 정렬
+      updatedPlan.blocks.sort((a, b) => {
+        if (a.day === b.day) {
+          return a.order - b.order;
+        }
+        return a.day - b.day;
+      });
+      
+      // 상태 업데이트
+      setPlan(updatedPlan);
     }
-    
-    setDraggedItem(null);
-  };
+  } catch (err) {
+    setError('블록 순서 변경 중 오류가 발생했습니다');
+    console.error(err);
+  }
+  
+  setDraggedItem(null);
+};
 
   // 날짜 포맷 함수
   const formatDate = (dateString) => {
