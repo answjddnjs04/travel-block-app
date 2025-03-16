@@ -10,20 +10,21 @@ const BlockDetail = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchBlock = async () => {
-      try {
-        const res = await api.get(`/api/blocks/${id}`);
-        setBlock(res.data);
-        setLoading(false);
-      } catch (err) {
-        setError('블록 정보를 가져오는 중 오류가 발생했습니다');
-        setLoading(false);
-        console.error('오류 상세 정보:', err);
-      }
-    };
+  // API 호출 대신 더미 데이터 사용
+  const dummyBlock = {
+    _id: id,
+    name: '서울 남산타워',
+    description: '서울의 중심에 위치한 남산서울타워는 대한민국을 대표하는 관광지입니다. 서울의 아름다운 전망을 볼 수 있으며, 각종 문화 행사와 레스토랑 등이 있어 즐길거리가 풍부합니다.',
+    location: '서울 용산구 남산공원길 105',
+    tags: ['서울', '관광', '전망대', '데이트'],
+    imageUrl: 'https://via.placeholder.com/800x400?text=남산타워',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
 
-    fetchBlock();
-  }, [id]);
+  setBlock(dummyBlock);
+  setLoading(false);
+}, [id]);
 
   const handleDelete = async () => {
     if (window.confirm('정말로 이 블록을 삭제하시겠습니까?')) {
