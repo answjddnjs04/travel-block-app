@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import api from '../utils/axiosConfig';
 
 const BlockForm = () => {
@@ -21,83 +21,89 @@ const BlockForm = () => {
   const { name, description, location, tags, imageUrl } = formData;
 
   useEffect(() => {
-  // 수정 모드인 경우 더미 데이터 사용
-  if (id) {
-    setIsEdit(true);
-    setLoading(true);
-    
-    // 더미 데이터 설정
-    const dummyBlockData = {
-      name: '서울 남산타워',
-      description: '서울의 중심에 위치한 남산서울타워는 대한민국을 대표하는 관광지입니다.',
-      location: '서울 용산구 남산공원길 105',
-      tags: ['서울', '관광', '전망대'],
-      imageUrl: 'https://via.placeholder.com/400x200?text=남산타워'
-    };
-    
-    setFormData({
-      name: dummyBlockData.name,
-      description: dummyBlockData.description || '',
-      location: dummyBlockData.location || '',
-      tags: dummyBlockData.tags.join(', '),
-      imageUrl: dummyBlockData.imageUrl || ''
-    });
-    
-    setLoading(false);
-  }
-}, [id]);
+    // 수정 모드인 경우 기존 블록 데이터 가져오기
+    if (id) {
+      setIsEdit(true);
+      const fetchBlock = async () => {
+        try {
+          setLoading(true);
+          const res = await api.getBlock(id);
+          const block = res.data;
+          
+          setFormData({
+            name: block.name || '',
+            description: block.description || '',
+            location: block.location || '',
+            tags: block.tags ? block.tags.join(', ') : '',
+            imageUrl: block.imageUrl || ''
+          });
+          
+          setLoading(false);
+        } catch (err) {
+          console.error('블록 가져오기 오류:', err);
+          setError('블록 정보를 가져오는 중 오류가 발생했습니다.');
+          setLoading(false);
+        }
+      };
+
+      fetchBlock();
+    }
+  }, [id]);
 
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const onSubmit = async (e) => {
-  e.preventDefault();
-  
-  // 기본 검증
-  if (!name.trim()) {
-    setError('블록 이름은 필수입니다');
-    return;
-  }
-
-  // 태그 변환 (문자열 -> 배열)
-  const tagsArray = tags
-    .split(',')
-    .map(tag => tag.trim())
-    .filter(tag => tag !== '');
-
-  const blockData = {
-    name,
-    description,
-    location,
-    tags: tagsArray,
-    imageUrl
-  };
-
-  try {
-    setLoading(true);
-    setError('');
+    e.preventDefault();
     
-    // API 호출 대신 성공 메시지 표시
-    if (isEdit) {
-      setSuccess('블록이 성공적으로 수정되었습니다');
-    } else {
-      setSuccess('새 블록이 성공적으로 생성되었습니다');
+    // 기본 검증
+    if (!name.trim()) {
+      setError('블록 이름은 필수입니다');
+      return;
     }
-    
-    setLoading(false);
-    
-    // 3초 후 목록 페이지로 이동
-    setTimeout(() => {
-      navigate('/');
-    }, 3000);
-    
-  } catch (err) {
-    setError('블록 저장 중 오류가 발생했습니다');
-    setLoading(false);
-    console.error(err);
-  }
-};
+
+    // 태그 변환 (문자열 -> 배열)
+    const tagsArray = tags
+      .split(',')
+      .map(tag => tag.trim())
+      .filter(tag => tag !== '');
+
+    const blockData = {
+      name,
+      description,
+      location,
+      tags: tagsArray,
+      imageUrl
+    };
+
+    try {
+      setLoading(true);
+      setError('');
+      
+      if (isEdit) {
+        // 기존 블록 수정
+        await api.updateBlock(id, blockData);
+        setSuccess('블록이 성공적으로 수정되었습니다');
+      } else {
+        // 새 블록 생성
+        await api.createBlock(blockData);
+        setSuccess('새 블록이 성공적으로 생성되었습니다');
+      }
+      
+      setLoading(false);
+      
+      // 잠시 후 목록 페이지로 이동
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
+      
+    } catch (err) {
+      console.error('블록 저장 오류:', err);
+      setError('블록 저장 중 오류가 발생했습니다');
+      setLoading(false);
+    }
+  };
 
   if (loading && isEdit) {
     return <div>블록 정보를 가져오는 중...</div>;
@@ -165,23 +171,4 @@ const BlockForm = () => {
           <label htmlFor="imageUrl">이미지 URL</label>
           <input
             type="text"
-            id="imageUrl"
-            name="imageUrl"
-            value={imageUrl}
-            onChange={onChange}
-            placeholder="이미지 URL을 입력하세요"
-          />
-        </div>
-        
-        <input
-          type="submit"
-          value={loading ? '저장 중...' : (isEdit ? '블록 수정' : '블록 생성')}
-          className="btn btn-primary"
-          disabled={loading}
-        />
-      </form>
-    </div>
-  );
-};
-
-export default BlockForm;
+            id="imageUrl
