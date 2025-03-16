@@ -10,14 +10,19 @@ const BlockList = () => {
   useEffect(() => {
     const fetchBlocks = async () => {
       try {
+<<<<<<< HEAD
         // 백엔드 API 호출 시도
         console.log('블록 데이터 가져오기 시도...');
         const res = await api.getBlocks();
         console.log('가져온 데이터:', res.data);
+=======
+        const res = await api.getBlocks();
+>>>>>>> 4b2f932f19fd349450138e06ebba8c09a25b578e
         setBlocks(res.data);
         setLoading(false);
       } catch (err) {
         console.error('블록 데이터 가져오기 오류:', err);
+<<<<<<< HEAD
         // 더미 데이터 사용 (백업 옵션)
         const dummyBlocks = [
           { 
@@ -43,6 +48,9 @@ const BlockList = () => {
         ];
         setBlocks(dummyBlocks);
         setError('API 호출에 실패했지만 더미 데이터를 표시합니다.');
+=======
+        setError('블록 목록을 가져오는 중 오류가 발생했습니다.');
+>>>>>>> 4b2f932f19fd349450138e06ebba8c09a25b578e
         setLoading(false);
       }
     };
@@ -64,8 +72,11 @@ const BlockList = () => {
 
       <h1>여행 블록 목록</h1>
       
+<<<<<<< HEAD
       {error && <div className="alert alert-danger">{error}</div>}
       
+=======
+>>>>>>> 4b2f932f19fd349450138e06ebba8c09a25b578e
       {blocks.length === 0 ? (
         <div className="alert">등록된 블록이 없습니다. 첫 블록을 생성해보세요!</div>
       ) : (

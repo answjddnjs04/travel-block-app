@@ -5,8 +5,9 @@
 ## 기능
 
 - 여행 블록 생성, 조회, 수정, 삭제 (CRUD)
-- 블록에 태그 추가 및 태그별 검색
-- 블록에 이미지 URL 추가 가능
+- 여행 계획 생성 및 관리
+- 계획에 블록 추가하고 일자별로 정리
+- 블록과 계획에 태그 추가 및 검색 가능
 - 반응형 디자인으로 모바일 환경 지원
 
 ## 기술 스택
@@ -41,7 +42,7 @@ cd travel-block-app
 ```
 cd backend
 npm install
-npm start
+npm run dev
 ```
 
 3. 프론트엔드 설정
@@ -56,43 +57,68 @@ npm start
 http://localhost:3000
 ```
 
+## 개발 모드
+
+개발 모드에서는 MongoDB 연결 없이 더미 데이터를 사용하여 테스트할 수 있습니다. 이는 프론트엔드 `axiosConfig.js` 파일에서 관리됩니다.
+
 ## 프로젝트 구조
 
 ```
-travel-block-app/                  # 루트 디렉토리
-│
-├── .gitignore                     # Git에서 제외할 파일 목록
-├── README.md                      # 프로젝트 설명 문서
+travel-block-app/
 │
 ├── backend/                       # 백엔드 디렉토리
 │   ├── package.json               # 백엔드 의존성 정보
-│   ├── server.js                  # 메인 서버 파일 (Express 앱 시작점)
+│   ├── server.js                  # 메인 서버 파일 (Express 앱)
 │   │
-│   ├── models/                    # 데이터베이스 모델 디렉토리
-│   │   └── blockModel.js          # 블록 데이터 모델 정의
+│   ├── models/                    # 데이터베이스 모델
+│   │   ├── blockModel.js          # 블록 데이터 모델
+│   │   └── planModel.js           # 여행 계획 모델
 │   │
-│   └── routes/                    # API 라우트 디렉토리
-│       └── blockRoutes.js         # 블록 관련 API 라우트 정의
+│   └── routes/                    # API 라우트
+│       ├── blockRoutes.js         # 블록 API 라우트
+│       └── planRoutes.js          # 계획 API 라우트
 │
 └── frontend/                      # 프론트엔드 디렉토리
     ├── package.json               # 프론트엔드 의존성 정보
     │
-    ├── public/                    # 정적 파일 디렉토리 (자동 생성됨)
+    ├── public/                    # 정적 파일
     │   ├── index.html             # 메인 HTML 파일
-    │   ├── favicon.ico            # 웹사이트 아이콘
     │   └── manifest.json          # PWA 매니페스트 파일
     │
-    └── src/                       # React 소스 코드 디렉토리
-        ├── App.js                 # 메인 앱 컴포넌트 (라우팅 설정)
-        ├── App.css                # 전역 스타일 정의
-        ├── index.js               # React 앱 진입점 (자동 생성됨)
+    └── src/                       # React 소스 코드
+        ├── App.js                 # 메인 앱 컴포넌트
+        ├── App.css                # 스타일 정의
+        ├── index.js               # React 진입점
+        ├── index.css              # 기본 스타일
         │
-        └── components/            # 리액트 컴포넌트 디렉토리
-            ├── Navbar.js          # 네비게이션 바 컴포넌트
-            ├── BlockList.js       # 블록 목록 표시 컴포넌트
-            ├── BlockForm.js       # 블록 생성/수정 폼 컴포넌트
-            └── BlockDetail.js     # 블록 상세 정보 컴포넌트
+        ├── components/            # 리액트 컴포넌트
+        │   ├── Navbar.js          # 네비게이션 바 컴포넌트
+        │   ├── BlockList.js       # 블록 목록 표시 컴포넌트
+        │   ├── BlockDetail.js     # 블록 상세 정보 컴포넌트
+        │   ├── BlockForm.js       # 블록 생성/수정 폼 컴포넌트
+        │   ├── PlanList.js        # 계획 목록 표시 컴포넌트
+        │   ├── PlanDetail.js      # 계획 상세 정보 컴포넌트
+        │   └── PlanForm.js        # 계획 생성/수정 폼 컴포넌트
+        │
+        └── utils/                 # 유틸리티 기능
+            └── axiosConfig.js     # API 호출 설정
 ```
+
+## 주요 기능 사용법
+
+### 여행 블록 관리
+
+1. **블록 생성**: '새 블록' 메뉴에서 장소나 경험에 대한 정보 입력
+2. **블록 목록 확인**: 메인 페이지에서 모든 블록 목록 확인 가능
+3. **블록 상세 정보**: 각 블록 카드의 '자세히 보기' 버튼 클릭
+4. **블록 수정/삭제**: 상세 페이지에서 수정 및 삭제 가능
+
+### 여행 계획 관리
+
+1. **계획 생성**: '새 여행 계획' 메뉴에서 여행 기본 정보 입력
+2. **블록 추가**: 계획 상세 페이지에서 일자별로 블록 추가
+3. **일정 관리**: 여러 날짜의 일정을 탭 인터페이스로 관리
+4. **계획 공유**: 공개 설정을 통해 다른 사용자와 공유 가능 (추후 기능)
 
 ## 확장 계획
 
@@ -102,7 +128,7 @@ travel-block-app/                  # 루트 디렉토리
 - 지도 API 통합
 - 이미지 업로드 기능
 - 소셜 미디어 공유
-- 여행 일정 계획
+- 여행 경비 추적 기능
 
 ## 기여
 

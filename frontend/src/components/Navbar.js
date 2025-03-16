@@ -9,10 +9,16 @@ const Navbar = () => {
       </h1>
       <ul>
         <li>
-          <Link to="/">홈</Link>
+          <Link to="/">블록 목록</Link>
         </li>
         <li>
-          <Link to="/create">새 블록 만들기</Link>
+          <Link to="/create">새 블록</Link>
+        </li>
+        <li>
+          <Link to="/plans">여행 계획</Link>
+        </li>
+        <li>
+          <Link to="/plans/create">새 여행 계획</Link>
         </li>
       </ul>
     </nav>

@@ -1,7 +1,7 @@
 {
   "name": "travel-block-app-backend",
   "version": "1.0.0",
-  "description": "Travel Block App Backend API",
+  "description": "여행 블록 앱 백엔드 API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

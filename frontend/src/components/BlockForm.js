@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import api from '../utils/axiosConfig';
 
 const BlockForm = () => {
   const navigate = useNavigate();
@@ -24,26 +24,25 @@ const BlockForm = () => {
     // 수정 모드인 경우 기존 블록 데이터 가져오기
     if (id) {
       setIsEdit(true);
-      setLoading(true);
-      
       const fetchBlock = async () => {
         try {
-          const res = await axios.get(`/api/blocks/${id}`);
-          const blockData = res.data;
+          setLoading(true);
+          const res = await api.getBlock(id);
+          const block = res.data;
           
           setFormData({
-            name: blockData.name,
-            description: blockData.description || '',
-            location: blockData.location || '',
-            tags: blockData.tags.join(', '),
-            imageUrl: blockData.imageUrl || ''
+            name: block.name || '',
+            description: block.description || '',
+            location: block.location || '',
+            tags: block.tags ? block.tags.join(', ') : '',
+            imageUrl: block.imageUrl || ''
           });
           
           setLoading(false);
         } catch (err) {
-          setError('블록 정보를 가져오는 중 오류가 발생했습니다');
+          console.error('블록 가져오기 오류:', err);
+          setError('블록 정보를 가져오는 중 오류가 발생했습니다.');
           setLoading(false);
-          console.error(err);
         }
       };
 
@@ -83,26 +82,26 @@ const BlockForm = () => {
       setError('');
       
       if (isEdit) {
-        // 블록 수정
-        await axios.put(`/api/blocks/${id}`, blockData);
+        // 기존 블록 수정
+        await api.updateBlock(id, blockData);
         setSuccess('블록이 성공적으로 수정되었습니다');
       } else {
         // 새 블록 생성
-        await axios.post('/api/blocks', blockData);
+        await api.createBlock(blockData);
         setSuccess('새 블록이 성공적으로 생성되었습니다');
       }
       
       setLoading(false);
       
-      // 3초 후 목록 페이지로 이동
+      // 잠시 후 목록 페이지로 이동
       setTimeout(() => {
         navigate('/');
-      }, 3000);
+      }, 2000);
       
     } catch (err) {
+      console.error('블록 저장 오류:', err);
       setError('블록 저장 중 오류가 발생했습니다');
       setLoading(false);
-      console.error(err);
     }
   };
 
@@ -178,14 +177,20 @@ const BlockForm = () => {
             onChange={onChange}
             placeholder="이미지 URL을 입력하세요"
           />
+          <small className="form-text">이미지 URL을 입력하거나 비워둘 수 있습니다</small>
         </div>
         
-        <input
-          type="submit"
-          value={loading ? '저장 중...' : (isEdit ? '블록 수정' : '블록 생성')}
-          className="btn btn-primary"
-          disabled={loading}
-        />
+        <div className="actions">
+          <input
+            type="submit"
+            value={loading ? '저장 중...' : (isEdit ? '블록 수정' : '블록 생성')}
+            className="btn btn-primary"
+            disabled={loading}
+          />
+          <Link to="/" className="btn">
+            취소
+          </Link>
+        </div>
       </form>
     </div>
   );

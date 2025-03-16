@@ -41,7 +41,7 @@ router.put('/:id', async (req, res) => {
   try {
     const updatedBlock = await Block.findByIdAndUpdate(
       req.params.id,
-      { ...req.body, updatedAt: Date.now() },
+      req.body,
       { new: true }
     );
     if (!updatedBlock) {

@@ -23,14 +23,6 @@ const blockSchema = new mongoose.Schema({
   imageUrl: {
     type: String,
     default: ''
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
   }
 }, {
   timestamps: true
