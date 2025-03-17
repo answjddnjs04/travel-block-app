@@ -5,21 +5,16 @@ const mongoose = require('mongoose');
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// CORS 설정 - 이 부분만 남기고 아래 app.use(cors()); 부분은 제거
+// CORS 설정 - 모든 출처 허용
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://crispy-space-pancake-pj9r5vpvxr4jc9w76-3001.app.github.dev',
-    'https://crispy-space-pancake-pj9r5vpvxr4jc9w76-3002.app.github.dev'
-  ],
+  origin: "*", // 모든 출처 허용
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: true
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
+// 참고: origin: "*"와 credentials: true는 함께 사용할 수 없음
+// 인증이 필요하지 않은 개발 환경에서는 이 설정이 가장 간단함
 
-// CORS 설정
-app.use(cors());
 app.use(express.json());
 
 // MongoDB 연결
